@@ -20,7 +20,7 @@ function getRndInteger(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 //newName & setname vars & functions
-let newName = '',xname ='';
+let newName = '', xname = '';
 function setName(name) {
     console.log('setname', name);
     newName = name;
@@ -31,10 +31,10 @@ function getName(name) {
     return datamuse.request('words?sl=' + name)
         .then((json) => {
             var rnd = json[getRndInteger(0, json.length)]["word"];
-        console.log('then', rnd);
-        setName(rnd);
-        return json[getRndInteger(0, json.length)]["word"];
-    });
+            console.log('then', rnd);
+            setName(rnd);
+            return json[getRndInteger(0, json.length)]["word"];
+        });
 }
 
 
@@ -43,6 +43,7 @@ client.on('message', message => {
     // Ignore messages that aren't from a guild
     if (!message.guild) return;
 
+    // Create an event listener for new guild members
     // If the message content starts with "!change"
     if (message.content.startsWith('!change')) {
         // Assuming we mention someone in the message, this will return the user
@@ -54,28 +55,46 @@ client.on('message', message => {
             const member = message.guild.member(user);
             // If the member is in the guild
             if (member) {
-                /***
+                /**
                  * Change the Nickname for the member
                  * Make sure you run this on a member, not a user!
                  * There are differences between a user and a member
-                 ***/
+                 */
                 console.log(user.tag, member.displayName);
                 //Users' Display Name
                 let dsn = member.displayName;
                 //Users' username split and only selects their username. ie. TheBestNameEver#1234 = [TheBestNameEver,1234]
                 let username = user.tag.split("#")[0];
                 datamuse.request('words?sl=' + dsn)
-                .then((json) => {
-                    var rnd = json[getRndInteger(0, json.length)]["word"];
-                    member.setNickname(rnd).then(() => {
-                        message.reply('Successfully changed the nickname of ' + dsn + 'to ' + rnd);
+                    .then((json) => {
+                        var rnd = json[getRndInteger(0, json.length)]["word"];
+                        member.setNickname(rnd).then(() => {
+                            message.reply('Successfully changed the nickname of ' + dsn + 'to ' + rnd);
+                        }).catch(err => {
+                            // An error happened
+                            // This is generally due to the bot not being able to change the nickname for the given member,
+                            // either due to missing permissions or role hierarchy
+                            message.reply('I was unable to change the nickname of the member.');
+                            member.setNickname('4th Grad the third').then(() => {
+                                message.reply('Successfully changed the nickname of 4th Grad the third');
+                            }).catch(err => {
+                                // An error happened
+                                // This is generally due to the bot not being able to nickname for the given member,
+                                // either due to missing permissions or role hierarchy
+                                message.reply('I was unable to change the nickname of the member.');
+                                // Log the error
+                                console.error(err);
+                            });
+                            // Log the error
+                            console.error(err);
+                        });
                     }).catch(err => {
                         // An error happened
-                        // This is generally due to the bot not being able to change the nickname for the given member,
+                        // This is generally due to the bot not being able to nickname for the given member,
                         // either due to missing permissions or role hierarchy
-                        message.reply('I was unable to change the nickname of the member.');
-                        member.setNickname('4th Grad the third').then(() => {
-                            message.reply('Successfully changed the nickname of 4th Grad the third');
+                        message.reply('I was unable to change the rnd nickname of the member.');
+                        member.setNickname('2nd grad the second').then(() => {
+                            message.reply('Successfully changed the nickname of 2nd grad the second');
                         }).catch(err => {
                             // An error happened
                             // This is generally due to the bot not being able to nickname for the given member,
@@ -84,24 +103,6 @@ client.on('message', message => {
                             // Log the error
                             console.error(err);
                         });
-                        // Log the error
-                        console.error(err);
-                    });
-                }).catch(err => {
-                        // An error happened
-                        // This is generally due to the bot not being able to nickname for the given member,
-                        // either due to missing permissions or role hierarchy
-                    message.reply('I was unable to change the rnd nickname of the member.');
-                    member.setNickname('2nd grad the second').then(() => {
-                        message.reply('Successfully changed the nickname of 2nd grad the second');
-                    }).catch(err => {
-                        // An error happened
-                        // This is generally due to the bot not being able to nickname for the given member,
-                        // either due to missing permissions or role hierarchy
-                        message.reply('I was unable to change the nickname of the member.');
-                        // Log the error
-                        console.error(err);
-                    });
                         // Log the error
                         console.error(err);
                     });
@@ -116,32 +117,22 @@ client.on('message', message => {
         }
     }
 
-
     if (message.content.startsWith('!help')) {
         // Assuming we mention someone in the message, this will return the user
+        console.log("!help");
         const user = message.mentions.users.first();
-        // If we have a user mentioned
-        if (user) {
-            // Now we get the member from the user
-            const member = message.guild.member(user);
-            // If the member is in the guild
-            if (member) {
-                /***
-                 * Display Help Commands
-                 ***/
-                datamuse.request('words?sl=brendon')
-                    .then((json) => {
-                        var rnd = json[getRndInteger(0, json.length)]["word"];
-                        message.reply('Hello, I am ' + rnd + 'Whats a compuutterrr?')
-                        }).catch(err => {
-                            // An error happened
-                                console.error(err);
-                        });
-
-            } 
+        datamuse.request('words?sl=Brendon')
+            .then((json) => {
+                var rnd = json[getRndInteger(0, json.length)]["word"];
+                message.reply('Hello, I am ' + rnd + '! Whats a Compuutterrr? \n' + '```You can try: !change @Brendon to see if it will make him a meme...```')
+            }).catch(err => {
+                // An error happened
+                console.error(err);
+            });
     }
-});
 
+
+});
 
 
 //Connect Bot to Discord
