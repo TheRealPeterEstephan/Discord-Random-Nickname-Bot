@@ -12,37 +12,38 @@ const client = new Discord.Client();
  * received from Discord
  */
 client.on('ready', () => {
-    console.log('I am ready!');
+    console.log('I am ready to make people into MEMES!');
 });
 
+//Ran. Array Selection Value
 function getRndInteger(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
 }
-
-function getName(name) {
-    datamuse.request('words?sl=' + name);
-    .then((json) => {
-           json[getRndInteger(0, json.length)]["word"];
-        });
-    return
-
-
-
-
-    //console.log(new_name);
-    //return new_name;
-    //return new_name
+//newName & setname vars & functions
+let newName = '',xname ='';
+function setName(name) {
+    console.log('setname', name);
+    newName = name;
 }
 
-let newName = getName("Brendon");
+//Lookup similar words to the Discord username
+function getName(name) {
+    return datamuse.request('words?sl=' + name)
+        .then((json) => {
+            var rnd = json[getRndInteger(0, json.length)]["word"];
+        console.log('then', rnd);
+        setName(rnd);
+        return json[getRndInteger(0, json.length)]["word"];
+    });
+}
 
-console.log(getName("Brendon"));
 
+//Check for messages in Channels and Respond
 client.on('message', message => {
     // Ignore messages that aren't from a guild
     if (!message.guild) return;
 
-    // If the message content starts with "!kick"
+    // If the message content starts with "!change"
     if (message.content.startsWith('!change')) {
         // Assuming we mention someone in the message, this will return the user
         // Read more about mentions over at https://discord.js.org/#/docs/main/stable/class/MessageMentions
@@ -54,23 +55,57 @@ client.on('message', message => {
             // If the member is in the guild
             if (member) {
                 /**
-                 * Kick the member
+                 * Change the Nickname for the member
                  * Make sure you run this on a member, not a user!
-                 * There are big differences between a user and a member
+                 * There are differences between a user and a member
                  */
-                /**member.kick('Optional reason that will display in the audit logs').then(() => {
-                    // We let the message author know we were able to kick the person
-                    message.reply(`Successfully kicked ${user.tag}`); **/
-                member.setNickname('Banana Bread').then(() => {
-                    message.reply('Successfully changed the nickname of the user.');
+                console.log(user.tag, member.displayName);
+                //Users' Display Name
+                let dsn = member.displayName;
+                //Users' username split and only selects their username. ie. TheBestNameEver#1234 = [TheBestNameEver,1234]
+                let username = user.tag.split("#")[0];
+                datamuse.request('words?sl=' + dsn)
+                .then((json) => {
+                    var rnd = json[getRndInteger(0, json.length)]["word"];
+                    member.setNickname(rnd).then(() => {
+                        message.reply('Successfully changed the nickname of ' + dsn + 'to ' + rnd);
+                    }).catch(err => {
+                        // An error happened
+                        // This is generally due to the bot not being able to change the nickname for the given member,
+                        // either due to missing permissions or role hierarchy
+                        message.reply('I was unable to change the nickname of the member.');
+                        member.setNickname('4th Grad the third').then(() => {
+                            message.reply('Successfully changed the nickname of 4th Grad the third');
+                        }).catch(err => {
+                            // An error happened
+                            // This is generally due to the bot not being able to nickname for the given member,
+                            // either due to missing permissions or role hierarchy
+                            message.reply('I was unable to change the nickname of the member.');
+                            // Log the error
+                            console.error(err);
+                        });
+                        // Log the error
+                        console.error(err);
+                    });
                 }).catch(err => {
-                    // An error happened
-                    // This is generally due to the bot not being able to kick the member,
-                    // either due to missing permissions or role hierarchy
-                    message.reply('I was unable to change the nickname of the member.');
-                    // Log the error
-                    console.error(err);
-                });
+                        // An error happened
+                        // This is generally due to the bot not being able to nickname for the given member,
+                        // either due to missing permissions or role hierarchy
+                    message.reply('I was unable to change the rnd nickname of the member.');
+                    member.setNickname('2nd grad the second').then(() => {
+                        message.reply('Successfully changed the nickname of 2nd grad the second');
+                    }).catch(err => {
+                        // An error happened
+                        // This is generally due to the bot not being able to nickname for the given member,
+                        // either due to missing permissions or role hierarchy
+                        message.reply('I was unable to change the nickname of the member.');
+                        // Log the error
+                        console.error(err);
+                    });
+                        // Log the error
+                        console.error(err);
+                    });
+
             } else {
                 // The mentioned user isn't in this guild
                 message.reply('That user isn\'t in this guild!');
@@ -82,5 +117,10 @@ client.on('message', message => {
     }
 });
 
-// Log our bot in using the token from https://discordapp.com/developers/applications/me
-client.login('[HIDDEN]');
+
+
+//Connect Bot to Discord
+var fs = require('fs');
+var token_array = fs.readFileSync('./auth.json', 'utf-8');
+var token_array_data = JSON.parse(token_array);
+client.login(token_array_data["token"]);
