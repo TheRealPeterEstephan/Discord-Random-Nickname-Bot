@@ -54,11 +54,11 @@ client.on('message', message => {
             const member = message.guild.member(user);
             // If the member is in the guild
             if (member) {
-                /**
+                /***
                  * Change the Nickname for the member
                  * Make sure you run this on a member, not a user!
                  * There are differences between a user and a member
-                 */
+                 ***/
                 console.log(user.tag, member.displayName);
                 //Users' Display Name
                 let dsn = member.displayName;
@@ -114,6 +114,31 @@ client.on('message', message => {
         } else {
             message.reply('You didn\'t mention the user for me to change the name to!');
         }
+    }
+
+
+    if (message.content.startsWith('!help')) {
+        // Assuming we mention someone in the message, this will return the user
+        const user = message.mentions.users.first();
+        // If we have a user mentioned
+        if (user) {
+            // Now we get the member from the user
+            const member = message.guild.member(user);
+            // If the member is in the guild
+            if (member) {
+                /***
+                 * Display Help Commands
+                 ***/
+                datamuse.request('words?sl=brendon')
+                    .then((json) => {
+                        var rnd = json[getRndInteger(0, json.length)]["word"];
+                        message.reply('Hello, I am ' + rnd + 'Whats a compuutterrr?')
+                        }).catch(err => {
+                            // An error happened
+                                console.error(err);
+                        });
+
+            } 
     }
 });
 
