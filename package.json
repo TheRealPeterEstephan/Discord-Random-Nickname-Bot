@@ -1,0 +1,13 @@
+{
+        "name": "nickname-change-bot",
+        "version": "1.0 .0",
+        "description": "Change Discord Server Member(s) nicknames Bot",
+        "main": "bot.js",
+        "author": "TheRealPeterEstephan",
+        "dependencies": {
+                "datamuse": "^1.0.5",
+                "discord.io": "https://github.com/woor/discord.io/tarball/gateway_v6",
+                "discord.js": "^11.4.2",
+                "winston": "^3.1.0"
+        }
+}
